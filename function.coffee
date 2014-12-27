@@ -41,7 +41,7 @@ $F::times = (times, self)->
 	index = 0
 	while index++ < times
 		@.call self, index
-$F::repit = (times, self)->
+$F::repeat = (times, self)->
 	index = 0
 	while index++ < times
 		@.call self, index
