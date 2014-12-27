@@ -1,28 +1,29 @@
 
 $F = (fn)->
-	res = ->fn.apply @, arguments
-	res.constructor = $F
-	res.__proto__ = $F::
-	res
-$F:: = $F
+	$F::(-> fn.apply @, arguments)
+$F:: = (fn)->
+	fn.constructor = $F
+	fn.__proto__ = $F::
+	fn
 $F::then = (fn)->
 	current = @
-	@constructor -> fn.call @, current.apply @, arguments
+	@constructor::(-> fn.call @, current.apply @, arguments)
 $F::catch = (fn)->
 	current = @
-	@constructor ->
+	@constructor::(->
 		try current.apply @, arguments
 		catch e then fn.call @, e
+	)
 $F::bind = if Function::bind typeof "function" then ->
-	@constructor ->
-		Function::bind.apply @, arguments
+	@constructor::(-> Function::bind.apply @, arguments)
 else ->
 	current = @
-	@constructor (sels)-> ->
+	@constructor::((sels)-> ->
 		current.apply self, arguments
+	)
 $F::bindArguments = (args...)->
 	current = @
-	@constructor -> current.apply @, args
+	@constructor::(-> current.apply @, args)
 $F::catchCond = (cond, fn)->
 	@catch (e)->
 		throw e unless cond.call @, e
@@ -32,16 +33,17 @@ $F::catchVal = (val, fn)->
 $F::catchType = (type, fn)->
 	@catchCond ((e)-> (e instanceof type) or (e.constructor == type)), fn
 $F::loop = (fn)->
-	@constructor ->
+	@constructor::(->
 		val = current.apply @, arguments
 		try loop val = fn.call @, val
 		catch e then return e
 		return
+	)
 $F::times = (times, self)->
 	index = 0
 	while index++ < times
 		@.call self, index
-$F::repit = (times, self)->
+$F::repeat = (times, self)->
 	index = 0
 	while index++ < times
 		@.call self, index
@@ -49,18 +51,20 @@ $F::repit = (times, self)->
 $F::curry = (times = 1)->
 	return @ if --times <= 0
 	current = @
-	@constructor (first)->
+	@constructor::((first)->
 		current.constructor(->current.call @, first, arguments...).curry times
+	)
 $F::bindedCurry = (times = 1)->
 	return @ if --times <= 0
 	current = @
-	@constructor (first)->
+	@constructor::((first)->
 		current.constructor(=>current.call @, first, arguments...).curry times
+	)
 $F::curryBreak = (steps...)->
 	return @ unless steps.length
 	current = @
 	step = do steps.shift
-	@constructor (args...)->
+	@constructor::((args...)->
 		current.constructor(
 			(startArgs...)->
 				startArgs = for i in [0...step] then startArgs[i]
@@ -70,9 +74,10 @@ $F::curryBreak = (steps...)->
 					args.push restArgs...
 					current.apply @, args
 		).curryBreak steps...
+	)
 $F::preprocessAll = (fn)->
 	current = @
-	@constructor (arr...)-> current.apply @, fn.call @, arr
+	@constructor::((arr...)-> current.apply @, fn.call @, arr)
 $F::flip = (from=0, to=1)->
 	return @ if from == to
 	[from, to] = [Math.min(from, to), Math.max(from, to)]
@@ -86,14 +91,16 @@ $F::flip = (from=0, to=1)->
 		res
 $F::preprocess = (fns...)->
 	current = @
-	@constructor (args...)->
+	@constructor::((args...)->
 		for fn, pos in fns
 			args[pos] = fn.call @, args[pos]
 		current.apply @, args
+	)
 $F::preprocessStrict = (fns...)->
 	current = @
-	@constructor (args...)->
+	@constructor::((args...)->
 		current.apply @, (fn.call @, args[pos] for fn, pos in fns)
+	)
 $F::guard = (cond)->
 	@then (value)->
 		throw new @Error unless cond.call @, value
@@ -103,33 +110,35 @@ $F::guardType = (type)->
 		(value instanceof type) or (value.constructor == type)
 $F::guardArguments = (conds...)->
 	current = @
-	@constructor ->
+	@constructor::(->
 		for cond, pos in conds
 			throw new Error unless cond.call @, arguments[pos]
 		current.call @, arguments
+	)
 $F::guardArgumentsTypes = (types...)->
 	@guardArguments (for type in types then (value)->
 		(value instanceof type) or (value.constructor == type)
 	)...
 $F::zipper = ->
 	current = @
-	@constructor (arrs...)->
+	@constructor::((arrs...)->
 		for i in [0 ... Math.min (arr.length for arr in arrs)...]
 			current.apply @, (arr[i] for arr in arrs)
+	)
 $F::zipWith = (self,arrs...)->
 	@zipper().apply self, arrs
 $F::zip = (arrs...)->
 	@zipper() arrs...
-
-$F::objectZipper = do-> objectZipper = (dest)->
+$F::objectZipper = (dest)->
 	current = @
-	@constructor (objs...)->
-		keys = objectZipper.commonKeys objs...
+	@constructor::((objs...)->
+		keys = current.constructor.commonKeys objs...
 		dest ?= {}
 		for key in keys
 			dest[key] = current.apply @, (obj[key] for obj in objs)
 		dest
-$F::objectZipper.commonKeys = (objs...)->
+	)
+$F.commonKeys = (objs...)->
 	keys = for obj in objs
 			(key for key of obj).sort()
 	res = []
@@ -154,16 +163,20 @@ $F::cell = (params...)->
 	current = @
 	value = null
 	do recalc = -> value = current (for param in params then do param)...
-	res = @constructor ->
+	res = @constructor::(->
 		if arguments.length
 			if value != (newValue = arguments[0])
 				value = newValue
 				for related in res.relateds
 					do related.recalc
 		value
+	)
 	for param in params then param.relateds.push res
 	res.relateds = []
 	res.recalc = recalc
 	res
+
 $F.Error = class Error
 	toString:->"not implemented!"
+
+modele.exports = $F if module?.exports?
