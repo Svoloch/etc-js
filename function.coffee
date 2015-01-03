@@ -15,17 +15,26 @@ $F::catch = (fn)->
 			try current.apply @, arguments
 			catch e then fn.call @, e
 	)
-$F::bind = if Function::bind typeof "function" then ->
-	@constructor::(-> Function::bind.apply @, arguments)
+$F::bind = if Function::bind typeof "function"
+	-> @constructor::(Function::bind.apply @, arguments)
 else ->
 	current = @
 	@constructor::(
-		(sels)-> ->
+		(self)-> ->
 			current.apply self, arguments
 	)
-$F::bindArguments = (args...)->
+$F::bindArgsStrict = (args...)->
 	current = @
 	@constructor::(-> current.apply @, args)
+$F::bindArgs = (startArgs...)->
+	current = @
+	@constructor::(
+		(restArgs...)->
+			args = []
+			args.push startArgs...
+			args.push restArgs...
+			current.apply @, args
+	)
 $F::catchCond = (cond, fn)->
 	@catch (e)->
 		throw e unless cond.call @, e
@@ -73,7 +82,7 @@ $F::curryBreak = (steps...)->
 		(args...)->
 			current.constructor(
 				(startArgs...)->
-					startArgs = for i in [0...step] then startArgs[i]
+					startArgs = startArgs[0...Math.max 0, step]
 					current.constructor (restArgs...)->
 						args = []
 						args.push startArgs...
