@@ -42,8 +42,9 @@ $F::catchCond = (cond, fn)->
 $F::catchVal = (val, fn)->
 	@catchCond ((e)-> e == val), fn
 $F::catchType = (type, fn)->
-	@catchCond ((e)-> (e instanceof type) or (e.constructor == type)), fn
+	@catchCond ((e)=> @constructor.as e, type), fn
 $F::loop = (fn)->
+	current = @
 	@constructor::(
 		->
 			val = current.apply @, arguments
@@ -98,11 +99,11 @@ $F::flip = (from=0, to=1)->
 	[from, to] = [Math.min(from, to), Math.max(from, to)]
 	@preprocessAll (arr)->
 		res = []
-		res.push arr.slice(0, from)...
+		res.push arr[0 ... from]...
 		res.push arr[to]
-		res.push arr.slice(from + 1, to - from)...
+		res.push arr[from + 1 ... to]...
 		res.push arr[from]
-		res.push arr.slice(to)...
+		res.push arr[to + 1 ...]...
 		res
 $F::preprocess = (fns...)->
 	current = @
@@ -123,8 +124,7 @@ $F::guard = (cond)->
 		throw new @Error unless cond.call @, value
 		value
 $F::guardType = (type)->
-	@guard (value)->
-		(value instanceof type) or (value.constructor == type)
+	@guard (value)=>@constructor.as value, type
 $F::guardArguments = (conds...)->
 	current = @
 	@constructor::(
@@ -134,8 +134,8 @@ $F::guardArguments = (conds...)->
 			current.call @, arguments
 	)
 $F::guardArgumentsTypes = (types...)->
-	@guardArguments (for type in types then (value)->
-		(value instanceof type) or (value.constructor == type)
+	@guardArguments (for type in types then (value)=>
+		@constructor.as value, type
 	)...
 $F::zipper = ->
 	current = @
@@ -147,19 +147,19 @@ $F::zipWith = (self,arrs...)->
 	@zipper().apply self, arrs
 $F::zip = (arrs...)->
 	@zipper() arrs...
-$F::objectZipper = (dest)->
+$F::objectZipper = (defDest)->
 	current = @
 	@constructor::(
 		(objs...)->
 			keys = current.constructor.commonKeys objs...
-			dest ?= {}
+			dest = defDest ? {}
 			for key in keys
 				dest[key] = current.apply @, (obj[key] for obj in objs)
 			dest
 	)
 $F.commonKeys = (objs...)->
 	keys = for obj in objs
-			(key for key of obj).sort()
+		(key for key of obj).sort()
 	res = []
 	try loop
 		break unless keys[0].length
@@ -200,6 +200,10 @@ $F::cell = (params...)->
 	res.recalc = recalc
 	res
 
+$F.as = $F::(
+	(value, type)->
+		(typeof value == type) or (value instanceof type) or (value.constructor == type)
+	).catch ->false
 $F.Error = class Error
 	toString:->"not implemented!"
 
