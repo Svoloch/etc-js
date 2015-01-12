@@ -48,8 +48,8 @@ $L "каррирование"
 $L test.curry(5)(0)(1)(2)(3,4)(5)
 
 $L "клетки"
-a = do $F(->0).cell
-b = do $F(->0).cell
+a = $F.cell 0
+b = $F.cell 0
 c = test.cell a, b
 $L do c
 a 1

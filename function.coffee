@@ -43,6 +43,8 @@ $F::catchVal = (val, fn)->
 	@catchCond ((e)-> e == val), fn
 $F::catchType = (type, fn)->
 	@catchCond ((e)=> @constructor.as e, type), fn
+$F::default = (value)->
+	@catch ->value
 $F::loop = (fn)->
 	current = @
 	@constructor::(
@@ -186,20 +188,24 @@ $F::cell = (params...)->
 	current = @
 	value = null
 	do recalc = -> value = current (for param in params then do param)...
-	res = @constructor::(
-		->
+	res = @constructor::(->value)
+	for param in params then param.relateds.push res
+	res.relateds = []
+	res.recalc = recalc
+	res
+$F.cell = (value)->
+	res = @::(
+		(newValue)->
 			if arguments.length
-				if value != (newValue = arguments[0])
+				if value != newValue
 					value = newValue
 					for related in res.relateds
 						do related.recalc
 			value
 	)
-	for param in params then param.relateds.push res
 	res.relateds = []
-	res.recalc = recalc
+	res.recalc = -> value
 	res
-
 $F.as = $F::(
 	(value, type)->
 		(typeof value == type) or (value instanceof type) or (value.constructor == type)
