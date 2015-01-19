@@ -5,15 +5,15 @@ $F:: = (fn)->
 	fn.constructor = $F
 	fn.__proto__ = $F::
 	fn
-$F::then = (fn)->
+$F::then = (fn, args...)->
 	current = @
-	@constructor::(-> fn.call @, current.apply @, arguments)
-$F::catch = (fn)->
+	@constructor::(-> fn.call @, (current.apply @, arguments), args...)
+$F::catch = (fn, args...)->
 	current = @
 	@constructor::(
 		->
 			try current.apply @, arguments
-			catch e then fn.call @, e
+			catch e then fn.call @, e, args...
 	)
 $F::bind = if Function::bind typeof "function"
 	-> @constructor::(Function::bind.apply @, arguments)
@@ -80,19 +80,16 @@ $F::bindedCurry = (times = 1)->
 $F::curryBreak = (steps...)->
 	return @ unless steps.length
 	current = @
-	step = do steps.shift
-	@constructor::(
-		(args...)->
-			current.constructor(
-				(startArgs...)->
-					startArgs = startArgs[0...Math.max 0, step]
-					current.constructor (restArgs...)->
-						args = []
-						args.push startArgs...
-						args.push restArgs...
-						current.apply @, args
-		).curryBreak steps...
-	)
+	step = steps[0]
+	(startArgs...)->
+		startArgs = startArgs[0...Math.max 0, step]
+		current.constructor::(
+			(restArgs...)->
+				args = []
+				args.push startArgs...
+				args.push restArgs...
+				current.apply @, args
+		).curryBreak steps[1...]...
 $F::preprocessAll = (fn)->
 	current = @
 	@constructor::((arr...)-> current.apply @, fn.call @, arr)
@@ -127,7 +124,7 @@ $F::guard = (cond)->
 		value
 $F::guardType = (type)->
 	@guard (value)=>@constructor.as value, type
-$F::guardArguments = (conds...)->
+$F::guardArgs = (conds...)->
 	current = @
 	@constructor::(
 		->
@@ -135,9 +132,10 @@ $F::guardArguments = (conds...)->
 				throw new Error unless cond.call @, arguments[pos]
 			current.call @, arguments
 	)
-$F::guardArgumentsTypes = (types...)->
-	@guardArguments (for type in types then (value)=>
-		@constructor.as value, type
+$F::guardArgsTypes = (types...)->
+	@guardArguments (
+		for type in types then (value)=>
+			@constructor.as value, type
 	)...
 $F::zipper = ->
 	current = @
@@ -214,3 +212,22 @@ $F.Error = class Error
 	toString:->"not implemented!"
 
 module.exports = $F if module?.exports?
+
+#Experimental
+$F::fnFlip = ->
+	current = @
+	(fstArgs...)->
+		fstThis = @
+		(sndArgs...)->
+			(current.apply @, sndArgs).apply fstThis, fstArgs
+$F.inherit = ->
+	Type = (fn)-> Type::(-> fn.apply @, arguments)
+	Type:: = @::(
+		(fn)->
+			fn.constructor = Type
+			fn.__proto__ = Type::
+			fn
+	)
+	Type.constructor = Type
+	Type.__proto__ = @
+	Type

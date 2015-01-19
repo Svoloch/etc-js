@@ -59,3 +59,13 @@ c 5
 $L do c
 a 6
 $L do c
+
+$L test.curryBreak() == test
+$L JSON.stringify test.curryBreak(0)()()
+$L test.curryBreak(2,3)(0,0,0,0,0)(1,1,1,1,1)(2,2,2,2,2)
+
+$F.test = "Type"
+$F::test = "Proto"
+G = do $F.inherit
+
+console.log G(->) instanceof $F, G.test, G().test, G::(->).test
