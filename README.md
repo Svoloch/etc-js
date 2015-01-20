@@ -3,7 +3,7 @@ Useful code collection for JavaScript platforms
 
 Prehistory
 --
-Long time writing JS code I collect reusable code fragments into one file for easely copypastering. Then this collection grows to sizes to be library.
+Long time writing JS code I collect reusable code fragments into one file for easely copying. Then this collection grows to sizes to be library.
 
 The basic concept
 --
@@ -11,7 +11,7 @@ Function is the same value as other types and can be calculated.
 
 All functions use `this` and can be used like methods. So calculated functions must use `this` and be methods.
 
-Features of realization
+Features of implementation
 --
 Most of used alhorithms use elementary abilities. So ECMAScript5 abilities are not needed. Library can be used with ECMAScript3.
 
@@ -19,9 +19,9 @@ Library architecture means to use library as it is. Without modification of code
 
 Why CoffeeScript
 --
-The library may be writen in pure JavaScript but CoffeeScript is simpler, shorter and faster. Not sense to make problems for myself.
+The library may be written in pure JavaScript but CoffeeScript is simpler, shorter and faster. Not sense to make problems for myself.
 
-Most of code examples writen in CoffeeScript. If you have questions about CoffeeScript code you can convert it to JavaScript by webinterface in [coffeescript.org].
+Most of code examples written in CoffeeScript. If you have questions about CoffeeScript code you can convert it to JavaScript by webinterface in [coffeescript.org].
 
 `$F`
 --
@@ -29,7 +29,7 @@ It is bad idea to modify `Function.prototype`, better to use `$F` decorator. It 
 
 `$F.prototype`
 --
-Was problem to name the function added other API to functions. Also prototype of function must be function else some object oriented abilities not work. Thus I solved this problems by one feature.
+Was question how to name the function added other API to functions. Also prototype of function must be function else some object oriented abilities not work. Thus I solved this problems by one feature.
 
 `$F.prototype.then`
 --
@@ -45,9 +45,9 @@ alert "example"
 
 `$F.prototype.catch`
 --
-Exeptions is the same result of calculating alhoruthm as returned value. More, it is part of API of standart liberis and meny others. So like result it may be returned.
+Exceptions is the same result of calculating alhoruthm as returned value. More, it is part of API of standart liberis and meny others. So like result it may be returned.
 
-`catch` function attachs expeption processor to current function allowing to use execution in following calculations.
+`catch` function attaches expeption processor to current function allowing to use execution in following calculations.
 ```coffeescript
 parseJSON = $F(JSON.parse).catch ->null
 ```
@@ -64,7 +64,7 @@ This ECMAScript5 function returns the function value. So better result function 
 
 `$F.prototype.bindArgs`
 --
-Returns the function were applyed passed arguments. Other argument you can pass to result.
+Returns the function were applied passed arguments. Other argument you can pass to result.
 
 `$F.prototype.bindArgsStrict`
 --
@@ -72,15 +72,15 @@ The same as `bingArgs` but rest arguments are ignored.
 
 `$F.prototype.catchCond`
 --
-Catchs exceptions by condition.
+Catches exceptions by condition.
 
 `$F.prototype.catchVal`
 --
-Catch exception if it equal to passed value.
+Catches exception if it equal to passed value.
 
 `$F.prototype.catchType`
 --
-Catch exception by type.
+Catches exception by type.
 
 `$F.prototype.default`
 --
@@ -118,15 +118,15 @@ The same as `curry` but `this` binded at first call.
 Break arguments list by fragments and curry by them.
 `$F.prototype.preprocessAll`
 --
-Apply the function to argument list and pass result as arguments to current function.
+Applies the function to argument list and pass result as arguments to current function.
 
 `$F.prototype.flip`
 --
-Change arguments orget.
+Changes arguments order.
 
 `$F.prototype.preprocess`
 --
-Apply passed function to argument in the same position.
+Applies passed function to argument in the same position.
 
 `$F.prototype.preprocessStrict`
 --
@@ -134,23 +134,23 @@ The same `preprocess` but not processed arguments ignored.
 
 `$F.prototype.guard`
 --
-Check result by condition. Throw `Error` exception on false.
+Checks result by condition. Throw `Error` exception on false.
 
 `$F.prototype.guardType`
 --
-Check result by type.
+Checks result by type.
 
 `$F.prototype.guardArgs`
 --
-Check each argument by condition functions.
+Checks each argument by condition functions.
 
 `$F.prototype.guardArgsTypes`
 --
-Check arguments by type list.
+Checks arguments by type list.
 
 `$F.prototype.zipper`
 --
-Returns function from array list that apply orienal function for each index untill array not finish.
+Returns function from array list that apply original function for each index until array not finish.
 
 `$F.prototype.zip`
 --
@@ -162,7 +162,7 @@ The same as `zip` but use first argument like `this`.
 
 `$F.prototype.objectZipper`
 --
-The same as `zipper` but for objects. Also you can set objet for change fields.
+The same as `zipper` but for objects. Also you can set object for change fields.
 
 `$F.prototype.zipObjects`
 --
@@ -178,11 +178,11 @@ The same as `zipObjects` but fields change in first argument using rest argument
 
 `$F.prototype.cell`
 --
-Create cell object like in some Clojure liberis. Arguments used as relative cells.
+Creates cell object like in some Clojure liberis. Arguments used as relative cells.
 
 `$F.prototype.fnFlip`
 --
-Change orger of call off function returning function.
+Changes order of call off function returning function.
 
 `$F.commonKeys`
 --
@@ -194,11 +194,11 @@ Detect the first argument is a instance of second. Works for types as constucror
 
 `$F.cell`
 --
-Create the cell for setting value.
+Creates the cell for setting value.
 
 `$F.inherit`
 --
-Create decorator with the same properties as `$F` but another.
+Creates decorator with the same behavior as `$F`. It is the children of `$F`
 
 `$F.Error`
 --
