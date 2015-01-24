@@ -185,11 +185,18 @@ $F::zipObjectsTo = (dest, objs...)->
 $F::cell = (params...)->
 	current = @
 	value = null
-	do recalc = -> value = current (for param in params then do param)...
-	res = @constructor::(->value)
+	changed = false
+	do recalc = ->
+		changed = false
+		value = current (for param in params then do param)...
+	res = @constructor::(-> unless changed then value else do recalc)
 	for param in params then param.relateds.push res
 	res.relateds = []
 	res.recalc = recalc
+	res.markChange = ->
+		changed = true
+		for related in res.relateds
+			do related.markChange
 	res
 $F.cell = (value)->
 	res = @::(
@@ -198,7 +205,7 @@ $F.cell = (value)->
 				if value != newValue
 					value = newValue
 					for related in res.relateds
-						do related.recalc
+						do related.markChange
 			value
 	)
 	res.relateds = []
@@ -207,7 +214,7 @@ $F.cell = (value)->
 $F.as = $F::(
 	(value, type)->
 		(typeof value == type) or (value instanceof type) or (value.constructor == type)
-	).catch ->false
+	).default false
 $F.Error = class Error
 	toString:->"not implemented!"
 
