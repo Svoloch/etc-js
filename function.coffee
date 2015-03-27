@@ -1,40 +1,44 @@
 
 $F = (fn)->
-	$F::(-> fn.apply @, arguments)
+	($F::)(-> fn.apply @, arguments)
 $F:: = (fn)->
 	fn.constructor = $F
 	fn.__proto__ = $F::
 	fn
 $F::then = (fn, args...)->
 	current = @
-	@constructor::(-> fn.call @, (current.apply @, arguments), args...)
+	(@constructor::)(-> fn.call @, (current.apply @, arguments), args...)
 $F::catch = (fn, args...)->
 	current = @
-	@constructor::(
+	(@constructor::)(
 		->
 			try current.apply @, arguments
 			catch e then fn.call @, e, args...
 	)
 $F::bind = if Function::bind typeof "function"
-	-> @constructor::(Function::bind.apply @, arguments)
+	-> (@constructor::)(Function::bind.apply @, arguments)
 else ->
 	current = @
-	@constructor::(
+	(@constructor::)(
 		(self)-> ->
 			current.apply self, arguments
 	)
 $F::bindArgsStrict = (args...)->
 	current = @
-	@constructor::(-> current.apply @, args)
+	(@constructor::)(-> current.apply @, args)
 $F::bindArgs = (startArgs...)->
 	current = @
-	@constructor::(
+	(@constructor::)(
 		(restArgs...)->
 			args = []
 			args.push startArgs...
 			args.push restArgs...
 			current.apply @, args
 	)
+$F::argToThis = (self)->
+	current = @bind self
+	-> current @, arguments...
+$F::thisToArg = -> @call.bind @
 $F::catchCond = (cond, fn)->
 	@catch (e)->
 		throw e unless cond.call @, e
@@ -47,7 +51,7 @@ $F::default = (value)->
 	@catch ->value
 $F::loop = (fn)->
 	current = @
-	@constructor::(
+	(@constructor::)(
 		->
 			val = current.apply @, arguments
 			try loop val = fn.call @, val
@@ -66,14 +70,14 @@ $F::repeat = (times, self)->
 $F::curry = (times = 1)->
 	return @ if --times <= 0
 	current = @
-	@constructor::(
+	(@constructor::)(
 		(first)->
 			current.constructor(->current.call @, first, arguments...).curry times
 	)
 $F::bindedCurry = (times = 1)->
 	return @ if --times <= 0
 	current = @
-	@constructor::(
+	(@constructor::)(
 		(first)->
 			current.constructor(=>current.call @, first, arguments...).curry times
 	)
@@ -83,7 +87,7 @@ $F::curryBreak = (steps...)->
 	step = steps[0]
 	(startArgs...)->
 		startArgs = startArgs[0...Math.max 0, step]
-		current.constructor::(
+		(current.constructor::)(
 			(restArgs...)->
 				args = []
 				args.push startArgs...
@@ -92,7 +96,7 @@ $F::curryBreak = (steps...)->
 		).curryBreak steps[1...]...
 $F::preprocessAll = (fn)->
 	current = @
-	@constructor::((arr...)-> current.apply @, fn.call @, arr)
+	(@constructor::)((arr...)-> current.apply @, fn.call @, arr)
 $F::flip = (from=0, to=1)->
 	return @ if from == to
 	[from, to] = [Math.min(from, to), Math.max(from, to)]
@@ -106,7 +110,7 @@ $F::flip = (from=0, to=1)->
 		res
 $F::preprocess = (fns...)->
 	current = @
-	@constructor::(
+	(@constructor::)(
 		(args...)->
 			for fn, pos in fns
 				args[pos] = fn.call @, args[pos]
@@ -114,7 +118,7 @@ $F::preprocess = (fns...)->
 	)
 $F::preprocessStrict = (fns...)->
 	current = @
-	@constructor::(
+	(@constructor::)(
 		(args...)->
 			current.apply @, (fn.call @, args[pos] for fn, pos in fns)
 	)
@@ -126,7 +130,7 @@ $F::guardType = (type)->
 	@guard (value)=>@constructor.as value, type
 $F::guardArgs = (conds...)->
 	current = @
-	@constructor::(
+	(@constructor::)(
 		->
 			for cond, pos in conds
 				throw new Error unless cond.call @, arguments[pos]
@@ -139,7 +143,7 @@ $F::guardArgsTypes = (types...)->
 	)...
 $F::zipper = ->
 	current = @
-	@constructor::((arrs...)->
+	(@constructor::)((arrs...)->
 		for i in [0 ... Math.min (arr.length for arr in arrs)...]
 			current.apply @, (arr[i] for arr in arrs)
 	)
@@ -149,7 +153,7 @@ $F::zip = (arrs...)->
 	@zipper() arrs...
 $F::objectZipper = (defDest)->
 	current = @
-	@constructor::(
+	(@constructor::)(
 		(objs...)->
 			keys = current.constructor.commonKeys objs...
 			dest = defDest ? {}
@@ -191,7 +195,7 @@ $F::cell = (params...)->
 		throw new current.Error() if destroyed
 		changed = false
 		value = current (for param in params then do param)...
-	res = @constructor::(-> unless changed then value else do recalc)
+	res = (@constructor::)(-> unless changed then value else do recalc)
 		.catch (e)->
 			changed = true
 			throw e
@@ -209,7 +213,7 @@ $F::cell = (params...)->
 			param.relateds = (item for item in param.relateds when item != res)
 	res
 $F.cell = (value)->
-	res = @::(
+	res = (@::)(
 		(newValue)->
 			if arguments.length
 				if value != newValue
@@ -221,7 +225,7 @@ $F.cell = (value)->
 	res.relateds = []
 	res.recalc = -> value
 	res
-$F.as = $F::(
+$F.as = ($F::)(
 	(value, type)->
 		(typeof value == type) or (value instanceof type) or (value.constructor == type)
 	).default false
@@ -238,8 +242,8 @@ $F::fnFlip = ->
 		(sndArgs...)->
 			(current.apply @, sndArgs).apply fstThis, fstArgs
 $F.inherit = ->
-	Type = (fn)-> Type::(-> fn.apply @, arguments)
-	Type:: = @::(
+	Type = (fn)-> (Type::)(-> fn.apply @, arguments)
+	Type:: = (@::)(
 		(fn)->
 			fn.constructor = Type
 			fn.__proto__ = Type::
