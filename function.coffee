@@ -37,7 +37,7 @@ $F::bindArgs = (startArgs...)->
 	)
 $F::argToThis = (self)->
 	current = @bind self
-	-> current @, arguments...
+	(@constructor::)(-> current @, arguments...)
 $F::thisToArg = -> @call.bind @
 $F::catchCond = (cond, fn)->
 	@catch (e)->

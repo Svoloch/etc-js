@@ -52,13 +52,153 @@ tests = [
 		test: ->
 			test.curry(5)(0)(1)(2)(3,4)(5) == "01235"
 	}
+	{
+		ru: "then"
+		en: "then"
+		test: ->
+			$L test.then((x)->"(#{x})").zip [1,2,3],[4,5,6,0],[7,8,9]
+			$L test.then((x)->"(#{x})").zip [1,2,3],[4,5,6,0],[7,8,9]
+			true
+	}
+	{
+		ru: "проверка default"
+		en: "default"
+		test: ->
+			$L $F(JSON.parse).default("error") ""
+			"error" == $F(JSON.parse).default("error") ""
+	}
+	{
+		ru: "catch"
+		en: "catch"
+		test: ->
+			do $F(->throw true).then(->false).catch((x)->x)
+	}
+	{
+		ru: "loop"
+		en: "loop"
+		test: ->true
+	}
+	{
+		ru: ""
+		en: ""
+		test: ->true
+	}
+	{
+		ru: ""
+		en: ""
+		test: ->true
+	}
+	{
+		ru: ""
+		en: ""
+		test: ->true
+	}
+	{
+		ru: ""
+		en: ""
+		test: ->true
+	}
+	{
+		ru: ""
+		en: ""
+		test: ->true
+	}
+	{
+		ru: ""
+		en: ""
+		test: ->true
+	}
+	{
+		ru: ""
+		en: ""
+		test: ->true
+	}
+	{
+		ru: ""
+		en: ""
+		test: ->true
+	}
+	{
+		ru: ""
+		en: ""
+		test: ->true
+	}
+	{
+		ru: ""
+		en: ""
+		test: ->true
+	}
+	{
+		ru: ""
+		en: ""
+		test: ->true
+	}
+	{
+		ru: ""
+		en: ""
+		test: ->true
+	}
+	{
+		ru: ""
+		en: ""
+		test: ->true
+	}
+	{
+		ru: ""
+		en: ""
+		test: ->true
+	}
+	{
+		ru: ""
+		en: ""
+		test: ->true
+	}
+	{
+		ru: ""
+		en: ""
+		test: ->true
+	}
+	{
+		ru: ""
+		en: ""
+		test: ->true
+	}
+	{
+		ru: ""
+		en: ""
+		test: ->true
+	}
+	{
+		ru: ""
+		en: ""
+		test: ->true
+	}
+	{
+		ru: ""
+		en: ""
+		test: ->true
+	}
+	{
+		ru: ""
+		en: ""
+		test: ->true
+	}
+	{
+		ru: ""
+		en: ""
+		test: ->true
+	}
+	{
+		ru: ""
+		en: ""
+		test: ->true
+	}
+	{
+		ru: ""
+		en: ""
+		test: ->true
+	}
 ]
-$L "проверка then"
-$L test.then((x)->"(#{x})").zip [1,2,3],[4,5,6,0],[7,8,9]
-
-$L "проверка catch"
-$L $F(JSON.parse).catch(->null) ""
-
 $L "проверка loop"
 $L do $F(->5).loop(
 	(x)->
@@ -88,7 +228,7 @@ $F.test = "Type"
 $F::test = "Proto"
 G = do $F.inherit
 
-$L G(->) instanceof $F, G.test, G().test, G::(->).test
+$L G(->) instanceof $F, G.test, G().test, ((G::)(->)).test
 
 tests.forEach (test)->
 	msg = test[locale]
