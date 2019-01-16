@@ -54,12 +54,12 @@ $F::loop = (fn)->
 		return
 $F::times = (times, self)->
 	index = 0
-	while index++ < times
-		@.call self, index
+	while index < times
+		@.call self, index++
 $F::repeat = (times, self)->
 	index = 0
-	while index++ < times
-		@.call self, index
+	while index < times
+		@.call self, index++
 	@
 $F::curry = (times = 1)->
 	return @ if --times <= 0
