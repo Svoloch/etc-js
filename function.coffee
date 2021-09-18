@@ -26,11 +26,7 @@ $F::bindArgsStrict = (args...)->
 $F::bindArgs = (startArgs...)->
 	current = @
 	@constructor.prototype (restArgs...)->
-		args = []
-		args.push startArgs...
-		args.push restArgs...
-		current.apply @, args
-
+		current.apply @, [startArgs..., restArgs...]
 $F::argToThis = (self)->
 	current = @bind self
 	@constructor.prototype -> current @, arguments...
