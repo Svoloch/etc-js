@@ -209,8 +209,6 @@ $F.as = $F.prototype((value, type)->
 $F.Error = class Error
 	toString: ->"not implemented!"
 
-module.exports = $F if module?.exports?
-
 #Experimental
 $F::fnFlip = ->
 	current = @
