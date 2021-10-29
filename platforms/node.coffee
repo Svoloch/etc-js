@@ -1,2 +1,2 @@
 
-module.exports = $F
+module.exports = $F_

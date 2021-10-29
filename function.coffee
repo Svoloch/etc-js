@@ -1,73 +1,73 @@
 
-$F = (fn)->
-	$F.prototype -> fn.apply @, arguments
-$F.prototype = (fn)->
-	fn.constructor = $F
-	fn.__proto__ = $F.prototype
+$F_ = (fn)->
+	$F_.prototype -> fn.apply @, arguments
+$F_.prototype = (fn)->
+	fn.constructor = $F_
+	fn.__proto__ = $F_.prototype
 	fn
-$F::then = (fn, args...)->
+$F_::then = (fn, args...)->
 	current = @
 	@constructor.prototype ->
 		fn.call @, (current.apply @, arguments), args...
-$F::catch = (fn, args...)->
+$F_::catch = (fn, args...)->
 	current = @
 	@constructor.prototype ->
 		try current.apply @, arguments
 		catch e then fn.call @, e, args...
-$F::bind = if Function::bind typeof "function"
+$F_::bind = if Function::bind typeof "function"
 	-> @constructor.prototype Function::bind.apply @, arguments
 else ->
 	current = @
 	@constructor.prototype (self)-> ->
 		current.apply self, arguments
-$F::bindArgsStrict = (args...)->
+$F_::bindArgsStrict = (args...)->
 	current = @
 	@constructor.prototype -> current.apply @, args
-$F::bindArgs = (startArgs...)->
+$F_::bindArgs = (startArgs...)->
 	current = @
 	@constructor.prototype (restArgs...)->
 		current.apply @, [startArgs..., restArgs...]
-$F::argToThis = (self)->
+$F_::argToThis = (self)->
 	current = @bind self
 	@constructor.prototype -> current @, arguments...
-$F::thisToArg = -> @constructor.prototype(@call).bind @
-$F::catchCond = (cond, fn)->
+$F_::thisToArg = -> @constructor.prototype(@call).bind @
+$F_::catchCond = (cond, fn)->
 	@catch (e)->
 		throw e unless cond.call @, e
 		fn.call @, e
-$F::catchVal = (val, fn)->
+$F_::catchVal = (val, fn)->
 	@catchCond ((e)-> e == val), fn
-$F::catchType = (type, fn)->
+$F_::catchType = (type, fn)->
 	@catchCond ((e)=> @constructor.as e, type), fn
-$F::default = (value)->
+$F_::default = (value)->
 	@catch ->value
-$F::loop = (fn)->
+$F_::loop = (fn)->
 	current = @
 	@constructor.prototype ->
 		val = current.apply @, arguments
 		try loop val = fn.call @, val
 		catch e then return e
 		return
-$F::times = (times, self)->
+$F_::times = (times, self)->
 	index = 0
 	while index < times
 		@.call self, index++
-$F::repeat = (times, self)->
+$F_::repeat = (times, self)->
 	index = 0
 	while index < times
 		@.call self, index++
 	@
-$F::curry = (times = 1)->
+$F_::curry = (times = 1)->
 	return @ if --times <= 0
 	current = @
 	@constructor.prototype (first)->
 		current.constructor(-> current.call @, first, arguments...).curry times
-$F::bindedCurry = (times = 1)->
+$F_::bindedCurry = (times = 1)->
 	return @ if --times <= 0
 	current = @
 	@constructor.prototype (first)->
 		current.constructor(=>current.call @, first, arguments...).curry times
-$F::curryBreak = (steps...)->
+$F_::curryBreak = (steps...)->
 	return @ unless steps.length
 	current = @
 	step = steps[0]
@@ -80,11 +80,11 @@ $F::curryBreak = (steps...)->
 				args.push restArgs...
 				current.apply @, args
 		).curryBreak steps[1...]...
-$F::preprocessAll = (fn)->
+$F_::preprocessAll = (fn)->
 	current = @
 	@constructor.prototype (arr...)->
 		current.apply @, fn.call @, arr
-$F::flip = (from=0, to=1)->
+$F_::flip = (from=0, to=1)->
 	return @ if from == to
 	[from, to] = [Math.min(from, to), Math.max(from, to)]
 	@preprocessAll (arr)->
@@ -95,7 +95,7 @@ $F::flip = (from=0, to=1)->
 		res.push arr[from]
 		res.push arr[to + 1 ...]...
 		res
-$F::preprocess = (fns...)->
+$F_::preprocess = (fns...)->
 	current = @
 	(@constructor::)(
 		(args...)->
@@ -103,37 +103,37 @@ $F::preprocess = (fns...)->
 				args[pos] = fn.call @, args[pos]
 			current.apply @, args
 	)
-$F::preprocessStrict = (fns...)->
+$F_::preprocessStrict = (fns...)->
 	current = @
 	@constructor.prototype (args...)->
 		current.apply @, (fn.call @, args[pos] for fn, pos in fns)
-$F::guard = (cond)->
+$F_::guard = (cond)->
 	@then (value)->
 		throw new @Error unless cond.call @, value
 		value
-$F::guardType = (type)->
+$F_::guardType = (type)->
 	@guard (value)=>@constructor.as value, type
-$F::guardArgs = (conds...)->
+$F_::guardArgs = (conds...)->
 	current = @
 	@constructor.prototype ->
 		for cond, pos in conds
 			throw new Error unless cond.call @, arguments[pos]
 		current.call @, arguments
-$F::guardArgsTypes = (types...)->
+$F_::guardArgsTypes = (types...)->
 	@guardArguments (
 		for type in types then (value)=>
 			@constructor.as value, type
 	)...
-$F::zipper = ->
+$F_::zipper = ->
 	current = @
 	@constructor.prototype (arrs...)->
 		for i in [0 ... Math.min (arr.length for arr in arrs)...]
 			current.apply @, (arr[i] for arr in arrs)
-$F::zipWith = (self,arrs...)->
+$F_::zipWith = (self,arrs...)->
 	@zipper().apply self, arrs
-$F::zip = (arrs...)->
+$F_::zip = (arrs...)->
 	@zipper() arrs...
-$F::objectZipper = (defDest)->
+$F_::objectZipper = (defDest)->
 	current = @
 	@constructor.prototype (objs...)->
 		keys = current.constructor.commonKeys objs...
@@ -141,7 +141,7 @@ $F::objectZipper = (defDest)->
 		for key in keys
 			dest[key] = current.apply @, (obj[key] for obj in objs)
 		dest
-$F.commonKeys = (objs...)->
+$F_.commonKeys = (objs...)->
 	keys = for obj in objs
 		(key for key of obj).sort()
 	res = []
@@ -160,13 +160,13 @@ $F.commonKeys = (objs...)->
 		res.push less
 		for key in keys then do key.shift
 	res
-$F::zipObjects = (objs...)->
+$F_::zipObjects = (objs...)->
 	@objectZipper() objs...
-$F::zipObjectsWith = (self, objs...)->
+$F_::zipObjectsWith = (self, objs...)->
 	@objectZipper().apply self, objs
-$F::zipObjectsTo = (dest, objs...)->
+$F_::zipObjectsTo = (dest, objs...)->
 	@objectZipper(dest) objs...
-$F::cell = (params...)->
+$F_::cell = (params...)->
 	current = @
 	value = null
 	changed = false
@@ -192,7 +192,7 @@ $F::cell = (params...)->
 		for param in params
 			param.relateds = (item for item in param.relateds when item != res)
 	res
-$F.cell = (value)->
+$F_.cell = (value)->
 	res = @prototype (newValue)->
 		if arguments.length
 			if value != newValue
@@ -203,20 +203,20 @@ $F.cell = (value)->
 	res.relateds = []
 	res.recalc = -> value
 	res
-$F.as = $F.prototype((value, type)->
+$F_.as = $F_.prototype((value, type)->
 	(typeof value == type) or (value instanceof type) or (value.constructor == type)
 ).default false
-$F.Error = class Error
+$F_.Error = class Error
 	toString: ->"not implemented!"
 
 #Experimental
-$F::fnFlip = ->
+$F_::fnFlip = ->
 	current = @
 	(fstArgs...)->
 		fstThis = @
 		(sndArgs...)->
 			(current.apply @, sndArgs).apply fstThis, fstArgs
-$F.inherit = ->
+$F_.inherit = ->
 	Type = (fn)-> Type.prototype -> fn.apply @, arguments
 	Type.prototype = @.prototype(
 		(fn)->

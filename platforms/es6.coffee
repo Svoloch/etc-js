@@ -1,2 +1,2 @@
 
-`export $F`
+`export const $F = $F_`
