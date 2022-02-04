@@ -1,2 +1,2 @@
 
-`export const $F = $F_`
+`export default $F`

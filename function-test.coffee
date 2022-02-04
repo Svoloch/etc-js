@@ -1,5 +1,5 @@
 $F = require './function'
-
+$F.use require('./cell'), require('promise')
 $L = $F(console.log).bind console
 test = $F (args...)->args.join ""
 
@@ -26,7 +26,7 @@ tests = [
 		ru: "смена порядка аргументов"
 		en: "arguments order changing"
 		test: ->
-					
+
 			$L test.flip(0,2) 0,1,2,3,4,5
 			$L test 2,1,0,3,4,5
 			$L test.flip(4,1) 0,1,2,3,4,5
