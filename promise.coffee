@@ -1,8 +1,8 @@
 
-export default ($F)->###!IMPORT###
+export default x = ($F)->###!IMPORT###
 do($F)->###!SCRIPT###
 module.exports = ($F)->###!REQUIRE###
-	$F.prototype.promiseToCallback = ->
+	$F::promiseToCallback = ->
 		fn = @
 		$F (args...)->
 			cb = args.pop()
@@ -15,7 +15,7 @@ module.exports = ($F)->###!REQUIRE###
 				.then (x)=> cb null, x
 				.catch (x)=> cb x
 			@
-	$F.prototype.callbackToPromise = ->
+	$F::callbackToPromise = ->
 		fn = @
 		$F (args...)->
 			new Promise (done, fail)=>
