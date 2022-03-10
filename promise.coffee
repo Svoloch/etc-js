@@ -1,5 +1,5 @@
 
-export default x = ($F)->###!IMPORT###
+export default ($F)->###!IMPORT###
 do($F)->###!SCRIPT###
 module.exports = ($F)->###!REQUIRE###
 	$F::promiseToCallback = ->
